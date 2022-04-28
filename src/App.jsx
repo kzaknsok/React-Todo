@@ -23,7 +23,12 @@ import "./styles.css";
  * inputテキストをincomplete-areaに表示させる
  * input情報のステート化
  * useState
- * 初期値は[""]空文字
+ * 初期値は""空状態にしておく、
+ * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+ * []👈これは無しで書かないと空の配列を渡してしまい、
+ * 入力値扱いされる。
+ * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+ *
  * 第一引数の変数名todoText,
  * 更新用の第二引数の変数名setTodoText,
  * todoTextはinputタグのvalueにあたる
@@ -52,7 +57,7 @@ import "./styles.css";
  * onClickAddに連動させるため、関数内の処理として、
  * 変数newTodosを実装。
  * [...incompleteTodos, todoText]
- * ...３つで配列を取得。
+ * ...３つで配列をコピー。
  * 第二引数にtodoTextを渡す事で配列の更新をする。
  *
  * setIncompleteTodos(newTodos)
@@ -67,13 +72,12 @@ import "./styles.css";
  * if (todoText === "") return;をonClickAddの最初に
  * 組み込むことで空文字の場合は処理を最初に戻すよう設定。
  * 追加が出来なくなる。
- * (一回は追加出来てしまう問題。。。未解決)
  *
  *
  */
 
 export const App = () => {
-  const [todoText, setTodoText] = useState([""]);
+  const [todoText, setTodoText] = useState("");
   const [incompleteTodos, setIncompleteTodos] = useState([
     "おおおお",
     "ええええ"
@@ -83,7 +87,9 @@ export const App = () => {
   const onChangeTodoText = (e) => setTodoText(e.target.value);
 
   const onClickAdd = () => {
-    if (todoText === "") return;
+    if (todoText === "")
+      // alert("Todoを入力しましょう");
+      return;
     const newTodos = [...incompleteTodos, todoText];
     setIncompleteTodos(newTodos);
     setTodoText("");
