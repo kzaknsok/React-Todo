@@ -57,7 +57,7 @@ import "./styles.css";
  * onClickAddに連動させるため、関数内の処理として、
  * 変数newTodosを実装。
  * [...incompleteTodos, todoText]
- * ...３つで配列をコピー。
+ * ...３つで情報を引き継がず新しい配列を作成。
  * 第二引数にtodoTextを渡す事で配列の更新をする。
  *
  * setIncompleteTodos(newTodos)
@@ -73,7 +73,26 @@ import "./styles.css";
  * 組み込むことで空文字の場合は処理を最初に戻すよう設定。
  * 追加が出来なくなる。
  *
+ * 削除ボタン
+ * 削除ボタンにクリックイベント設置「関数名{onClickDelete}」とする
+ * 関数を作成しalertで動作確認。
+ * この段階では何行目の削除ボタンを押したか判断できていない。
+ * map()で配列を受け取る際に、第二引数でindexを渡すと番号が受け取れる。
+ * onClickDelete(index)としてクリックイベントの対象を判別。
+ * 上の状態だとボタンを押さない状態でクリックイベントが反応してしまうため、
+ * クリックイベントに() => onClickDelete(index)として個別の新しい関数を作成する。
+ * 併せてonClickDelete関数の引数に(index)を渡して、
+ * alert(index)でインデックス番号が受け取れているか動作確認する。
  *
+ * 未完了のエリアから削除する（ボタンに連動して表示を削除）
+ * 削除用にnewTodos=[...incompleteTodos]を定義し、
+ * 引き継ぎなしの新しい配列を作成。
+ * newTodosに対して.splice()を使って消す。
+ * splice(index, 1); 第一引数でindexを受け取り削除対象を受け取り。
+ * 第二引数に処理を行う件数を設定。
+ * index何番目の一件を削除するという指示になる。
+ * setIncompleteTodos(newTodos);を記述して、
+ * 未完了エリアを更新する。
  */
 
 export const App = () => {
@@ -95,6 +114,12 @@ export const App = () => {
     setTodoText("");
   };
 
+  const onClickDelete = (index) => {
+    const newTodos = [...incompleteTodos];
+    newTodos.splice(index, 1);
+    setIncompleteTodos(newTodos);
+  };
+
   return (
     <>
       <div className="input-area">
@@ -108,12 +133,12 @@ export const App = () => {
       <div className="incomplete-area">
         <p className="title">未完了のToDo</p>
         <ul>
-          {incompleteTodos.map((todo) => {
+          {incompleteTodos.map((todo, index) => {
             return (
               <div key="{todo}" className="list-row">
                 <li>{todo}</li>
                 <button>完了</button>
-                <button>削除</button>
+                <button onClick={() => onClickDelete(index)}>削除</button>
               </div>
             );
           })}
