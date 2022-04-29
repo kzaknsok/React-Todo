@@ -24,10 +24,10 @@ import "./styles.css";
  * input情報のステート化
  * useState
  * 初期値は""空状態にしておく、
- * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+ * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
  * []👈これは無しで書かないと空の配列を渡してしまい、
  * 入力値扱いされる。
- * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+ * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
  *
  * 第一引数の変数名todoText,
  * 更新用の第二引数の変数名setTodoText,
@@ -80,7 +80,9 @@ import "./styles.css";
  * map()で配列を受け取る際に、第二引数でindexを渡すと番号が受け取れる。
  * onClickDelete(index)としてクリックイベントの対象を判別。
  * 上の状態だとボタンを押さない状態でクリックイベントが反応してしまうため、
- * クリックイベントに() => onClickDelete(index)として個別の新しい関数を作成する。
+ * クリックイベントに、
+ * ※※() => onClickDelete(index)※※
+ * として個別の新しい関数を作成する。
  * 併せてonClickDelete関数の引数に(index)を渡して、
  * alert(index)でインデックス番号が受け取れているか動作確認する。
  *
@@ -93,15 +95,70 @@ import "./styles.css";
  * index何番目の一件を削除するという指示になる。
  * setIncompleteTodos(newTodos);を記述して、
  * 未完了エリアを更新する。
+ *
+ * 完了ボタン
+ * buttonにonClickイベント設置、
+ * 関数名はonClickCompleteとし、deleteと同様に(index)を渡す。
+ * const onClickCompleteを定義、関数の引数はmapから渡されるindex。
+ * alert(index)でindex番号を受け取れていることを動作確認。
+ *
+ * 未完了エリアからの表示削除は、deleteと同じロジックのため一旦コピペ。
+ *     const *newTodos* = [...incompleteTodos];
+ *     newTodos.splice(index, 1);
+ * 完了ボタンでは未完了と完了の両側にまたがる処理となり、
+ * 二つの似た機能を持たせる点から、関数名を別ける為、
+ * 未完了エリアの処理はnewTodosからnewIncompleteTodosに改名。
+ *     newIncompleteTodos.splice(index, 1);
+ * とする事で、受け取った現状の配列[...incompleteTodos]から、
+ * 選択されたインデックス番号のリストに処理を施す。
+ *
+ * 完了エリアへの表示処理
+ * const newCompleteTodos定義。
+ * クリックでcompleteTodosの情報を取得[...completeTodos]。
+ * 同時に未完了エリアのincompleteTodosの選択されたリスト情報を取得したい、
+ * [...completeTodos, incompleteTodos[index]]として情報を得る。
+ * 結果として、未完了エリアでは選ばれたインデックス番号のリストを削除。
+ * 最後に、
+ * setIncompleteTodos(newIncompleteTodos)
+ * setCompleteTodos(newCompleteTodos)
+ * としてステートを更新。
+ * 完了エリアでは、
+ * 現在の情報を取得する+未完了エリアで削除対象となった
+ * (ここでは完了ボタンが押された事の意味)、
+ * リストの情報を合わせて、新しい完了エリアのリストを生成する事になる。
+ *
+ * 戻すボタン
+ * buttonにonClick設置+completeTodos.mapに第二引数index追記。
+ * クリックイベントonClickBack(index)とする。
+ * 関数onClickBackを定義。
+ * 念のためalert(index)で確認。
+ *     const newCompleteTodos = [...completeTodos];
+ * として現時点でのリストを取得。
+ *     newCompleteTodos.splice(index, 1);
+ * newCompleteTodosとして取得した完了リストから、
+ * 引数として渡されたindex番号のリストを一件削除する。
+ * これで戻すボタンに連動して完了エリアから選んだリストが消える。
+ *
+ * 完了ボタンの逆で、新しいnewIncompleteTodosを定義し、
+ * [...incompleteTodos, completeTodos[index]];で、
+ * 今の未完了エリアの情報を取得+戻すボタンで消したいリストの情報を、
+ * 引数indexに取得して合算。
+ * setCompleteTodos(newCompleteTodos);
+ * setIncompleteTodos(newIncompleteTodos);
+ * でステートの更新。
+ *
+ * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+ * ここまでのボタン処理は共通の関数化が可能
+ * 共通部分をまとめて、差分は引数で扱う
+ * ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+ *
+ * 初期値のテキストを削除して、空配列状態にしておく。
  */
 
 export const App = () => {
   const [todoText, setTodoText] = useState("");
-  const [incompleteTodos, setIncompleteTodos] = useState([
-    "おおおお",
-    "ええええ"
-  ]);
-  const [completeTodos, setCompleteTodos] = useState(["ああああ"]);
+  const [incompleteTodos, setIncompleteTodos] = useState([]);
+  const [completeTodos, setCompleteTodos] = useState([]);
 
   const onChangeTodoText = (e) => setTodoText(e.target.value);
 
@@ -118,6 +175,24 @@ export const App = () => {
     const newTodos = [...incompleteTodos];
     newTodos.splice(index, 1);
     setIncompleteTodos(newTodos);
+  };
+
+  const onClickComplete = (index) => {
+    const newIncompleteTodos = [...incompleteTodos];
+    newIncompleteTodos.splice(index, 1);
+
+    const newCompleteTodos = [...completeTodos, incompleteTodos[index]];
+    setIncompleteTodos(newIncompleteTodos);
+    setCompleteTodos(newCompleteTodos);
+  };
+
+  const onClickBack = (index) => {
+    const newCompleteTodos = [...completeTodos];
+    newCompleteTodos.splice(index, 1);
+
+    const newIncompleteTodos = [...incompleteTodos, completeTodos[index]];
+    setCompleteTodos(newCompleteTodos);
+    setIncompleteTodos(newIncompleteTodos);
   };
 
   return (
@@ -137,7 +212,7 @@ export const App = () => {
             return (
               <div key="{todo}" className="list-row">
                 <li>{todo}</li>
-                <button>完了</button>
+                <button onClick={() => onClickComplete(index)}>完了</button>
                 <button onClick={() => onClickDelete(index)}>削除</button>
               </div>
             );
@@ -147,11 +222,11 @@ export const App = () => {
       <div className="complete-area">
         <p className="title">完了のToDo</p>
         <ul>
-          {completeTodos.map((todo) => {
+          {completeTodos.map((todo, index) => {
             return (
               <div key="{todo}" className="list-row">
                 <li>{todo}</li>
-                <button>戻す</button>
+                <button onClick={() => onClickBack(index)}>戻す</button>
               </div>
             );
           })}
